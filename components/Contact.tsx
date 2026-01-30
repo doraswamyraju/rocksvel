@@ -17,7 +17,8 @@ export const Contact: React.FC<ContactProps> = ({ initialMessage = '' }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     const data = {
       name: formData.get('name'),
       phone: formData.get('phone'),
@@ -36,7 +37,7 @@ export const Contact: React.FC<ContactProps> = ({ initialMessage = '' }) => {
       if (response.ok) {
         alert("Thank you! We have received your inquiry and will contact you shortly.");
         setMessage('');
-        e.currentTarget.reset();
+        form.reset();
       } else {
         alert("Failed to send message. Please try again.");
       }
