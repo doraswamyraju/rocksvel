@@ -15,25 +15,28 @@ export const Contact: React.FC<ContactProps> = ({ initialMessage = '' }) => {
     }
   }, [initialMessage]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      name: formData.get('name'),
+      phone: formData.get('phone'),
+      email: formData.get('email'),
+      message: message,
+      type: 'general'
+    };
+
     try {
       const response = await fetch('/api/enquiries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: (e.target as any).name.value,
-          phone: (e.target as any).phone.value,
-          email: (e.target as any).email.value,
-          message: message,
-          type: 'general'
-        })
+        body: JSON.stringify(data)
       });
 
       if (response.ok) {
         alert("Thank you! We have received your inquiry and will contact you shortly.");
         setMessage('');
-        (e.target as HTMLFormElement).reset();
+        e.currentTarget.reset();
       } else {
         alert("Failed to send message. Please try again.");
       }
@@ -103,16 +106,16 @@ export const Contact: React.FC<ContactProps> = ({ initialMessage = '' }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2 sm:col-span-1">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                    <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none transition-shadow hover:border-brand-300" placeholder="Your Name" required />
+                    <input name="name" type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none transition-shadow hover:border-brand-300" placeholder="Your Name" required />
                   </div>
                   <div className="col-span-2 sm:col-span-1">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                    <input type="tel" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none transition-shadow hover:border-brand-300" placeholder="+91..." required />
+                    <input name="phone" type="tel" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none transition-shadow hover:border-brand-300" placeholder="+91..." required />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input type="email" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none transition-shadow hover:border-brand-300" placeholder="you@company.com" required />
+                  <input name="email" type="email" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none transition-shadow hover:border-brand-300" placeholder="you@company.com" required />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
