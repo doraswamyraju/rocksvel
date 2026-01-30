@@ -11,10 +11,8 @@ app.use(cors());
 app.use(express.json());
 
 // Database Connection
-mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rocksvel', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+// Database Connection
+mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rocksvel')
     .then(() => console.log('MongoDB Connected'))
     .catch(err => console.log(err));
 
