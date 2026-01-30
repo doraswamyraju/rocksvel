@@ -21,7 +21,7 @@ export const WhyChooseUs: React.FC = () => {
     },
     {
       icon: BrainCircuit,
-      title: "AI-Enhanced Learning",
+      title: "Smart-Enhanced Learning",
       description: "We leverage modern tech tools to personalize the learning experience for every team."
     },
     {
@@ -38,14 +38,14 @@ export const WhyChooseUs: React.FC = () => {
 
   return (
     <section className="py-24 bg-white relative overflow-hidden">
-       {/* Decorative Background Image */}
-       <div className="absolute top-0 right-0 w-full h-full opacity-5 pointer-events-none z-0">
-          <img 
-             src="https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=2874&auto=format&fit=crop"
-             alt="Pattern"
-             className="w-full h-full object-cover"
-          />
-       </div>
+      {/* Decorative Background Image */}
+      <div className="absolute top-0 right-0 w-full h-full opacity-5 pointer-events-none z-0">
+        <img
+          src="https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=2874&auto=format&fit=crop"
+          alt="Pattern"
+          className="w-full h-full object-cover"
+        />
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <Reveal className="text-center mb-16">
@@ -63,11 +63,11 @@ export const WhyChooseUs: React.FC = () => {
             <Reveal key={index} delay={index * 50}>
               <div className="group p-8 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden h-full">
                 <div className="absolute top-0 right-0 bg-brand-50 w-24 h-24 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-brand-600"></div>
-                
+
                 <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center mb-6 relative z-10 group-hover:bg-brand-600 transition-colors duration-300 shadow-sm">
                   <feature.icon size={28} className="text-brand-600 group-hover:text-white transition-colors duration-300" />
                 </div>
-                
+
                 <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-brand-600 transition-colors">
                   {feature.title}
                 </h3>

@@ -15,24 +15,45 @@ export const Contact: React.FC<ContactProps> = ({ initialMessage = '' }) => {
     }
   }, [initialMessage]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the data to a backend
-    alert("Thank you! We have received your inquiry and will contact you shortly.");
-    setMessage('');
+    try {
+      const response = await fetch('/api/enquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: (e.target as any).name.value,
+          phone: (e.target as any).phone.value,
+          email: (e.target as any).email.value,
+          message: message,
+          type: 'general'
+        })
+      });
+
+      if (response.ok) {
+        alert("Thank you! We have received your inquiry and will contact you shortly.");
+        setMessage('');
+        (e.target as HTMLFormElement).reset();
+      } else {
+        alert("Failed to send message. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong.");
+    }
   };
 
   return (
     <section id="contact" className="py-24 bg-brand-900 text-white clip-diagonal-reverse relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid md:grid-cols-2 gap-16 items-center">
-          
+
           <Reveal direction="left">
             <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Business?</h2>
             <p className="text-brand-100 mb-8 leading-relaxed text-lg">
               Whether you need to boost sales figures, develop future leaders, or ignite team motivation, Rocksvel is your partner in growth. Contact us today for a free consultation.
             </p>
-            
+
             <div className="space-y-6">
               <div className="flex items-start gap-4 group">
                 <div className="bg-brand-800 p-3 rounded-lg shrink-0 group-hover:bg-brand-700 transition-colors shadow-lg">
@@ -41,8 +62,8 @@ export const Contact: React.FC<ContactProps> = ({ initialMessage = '' }) => {
                 <div>
                   <h4 className="font-semibold text-lg">Visit Us</h4>
                   <p className="text-brand-200 text-sm mt-1 leading-relaxed group-hover:text-white transition-colors">
-                    3rd Floor, Dwarawati31 Pipeline,<br/>
-                    Subhodaya Colony, Kukatpally,<br/>
+                    3rd Floor, Dwarawati31 Pipeline,<br />
+                    Subhodaya Colony, Kukatpally,<br />
                     Hyderabad 500072
                   </p>
                 </div>
@@ -76,7 +97,7 @@ export const Contact: React.FC<ContactProps> = ({ initialMessage = '' }) => {
 
           <Reveal direction="right" delay={200}>
             <div className="bg-white rounded-2xl p-8 text-gray-800 shadow-2xl relative overflow-hidden">
-               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-600 to-cyan-500"></div>
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-600 to-cyan-500"></div>
               <h3 className="text-2xl font-bold mb-6">Send us a Message</h3>
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-2 gap-4">
@@ -95,10 +116,10 @@ export const Contact: React.FC<ContactProps> = ({ initialMessage = '' }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                  <textarea 
-                    rows={6} 
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none font-sans transition-shadow hover:border-brand-300" 
-                    placeholder="How can we help you?" 
+                  <textarea
+                    rows={6}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none font-sans transition-shadow hover:border-brand-300"
+                    placeholder="How can we help you?"
                     required
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
