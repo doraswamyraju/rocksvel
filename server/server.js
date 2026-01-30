@@ -90,10 +90,29 @@ Team Rocksvel
 // 2. Get All Enquiries (Admin)
 app.get('/api/enquiries', async (req, res) => {
     try {
-        // Simple security: check for a secret header or similar (To be improved)
-        // For now, open for development
         const enquiries = await Enquiry.find().sort({ createdAt: -1 });
         res.json(enquiries);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 3. Update Status
+app.patch('/api/enquiries/:id/status', async (req, res) => {
+    try {
+        const { status } = req.body;
+        const updated = await Enquiry.findByIdAndUpdate(req.params.id, { status }, { new: true });
+        res.json(updated);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 4. Delete Enquiry
+app.delete('/api/enquiries/:id', async (req, res) => {
+    try {
+        await Enquiry.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Deleted successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

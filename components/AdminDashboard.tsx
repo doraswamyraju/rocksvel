@@ -1,7 +1,7 @@
 
 
 import React, { useEffect, useState } from 'react';
-import { Mail, Phone, Briefcase, Search, LayoutDashboard, LogOut, CheckCircle2, CircleDashed, XCircle, ArrowUpRight, Filter, ChevronDown, Bell, Menu, X } from 'lucide-react';
+import { Mail, Phone, Briefcase, Search, LayoutDashboard, LogOut, CheckCircle2, CircleDashed, XCircle, ArrowUpRight, Filter, ChevronDown, Bell, Menu, X, Trash2, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Enquiry {
@@ -64,6 +64,35 @@ export const AdminDashboard: React.FC = () => {
             setLoading(false);
         }
     };
+
+    const updateStatus = async (id: string, newStatus: string) => {
+        try {
+            const res = await fetch(`/api/enquiries/${id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+            if (res.ok) {
+                setEnquiries(prev => prev.map(e => e._id === id ? { ...e, status: newStatus } : e));
+            }
+        } catch (err) {
+            console.error("Failed to update status", err);
+        }
+    };
+
+    const deleteEnquiry = async (id: string) => {
+        if (!window.confirm("Are you sure you want to delete this enquiry? This cannot be undone.")) return;
+        try {
+            const res = await fetch(`/api/enquiries/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setEnquiries(prev => prev.filter(e => e._id !== id));
+            }
+        } catch (err) {
+            console.error("Failed to delete", err);
+        }
+    };
+
+    const [selectedEnquiry, setSelectedEnquiry] = useState<Enquiry | null>(null);
 
     const filteredEnquiries = enquiries.filter(enq =>
         enq.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -224,7 +253,7 @@ export const AdminDashboard: React.FC = () => {
                                         <th className="px-6 py-4">Client</th>
                                         <th className="px-6 py-4">Contact Info</th>
                                         <th className="px-6 py-4">Inquiry Type</th>
-                                        <th className="px-6 py-4">Details</th>
+                                        <th className="px-6 py-4">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
@@ -232,10 +261,19 @@ export const AdminDashboard: React.FC = () => {
                                         filteredEnquiries.map((enq) => (
                                             <tr key={enq._id} className="hover:bg-blue-50/30 transition-colors group">
                                                 <td className="px-6 py-4 align-top w-24">
-                                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
-                                                        New
-                                                    </span>
-                                                    <div className="text-[10px] text-gray-400 mt-2">
+                                                    <select
+                                                        value={enq.status}
+                                                        onChange={(e) => updateStatus(enq._id, e.target.value)}
+                                                        className={`block w-full rounded-md border-0 py-1.5 pl-2 pr-6 text-xs font-medium ring-1 ring-inset focus:ring-2 focus:ring-brand-600 sm:leading-6 ${enq.status === 'new' ? 'bg-green-50 text-green-700 ring-green-600/20' :
+                                                                enq.status === 'contacted' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' :
+                                                                    'bg-gray-50 text-gray-600 ring-gray-500/10'
+                                                            }`}
+                                                    >
+                                                        <option value="new">New</option>
+                                                        <option value="contacted">Contacted</option>
+                                                        <option value="closed">Closed</option>
+                                                    </select>
+                                                    <div className="text-[10px] text-gray-400 mt-2 text-center">
                                                         {new Date(enq.createdAt).toLocaleDateString()}
                                                     </div>
                                                 </td>
@@ -267,27 +305,22 @@ export const AdminDashboard: React.FC = () => {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 align-top">
-                                                    {enq.type === 'planner' && enq.plannerData ? (
-                                                        <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 text-sm">
-                                                            <div className="font-semibold text-purple-700 mb-2 flex items-center gap-2 text-xs uppercase tracking-wide">
-                                                                <CheckCircle2 size={12} /> Generated Curriculum
-                                                            </div>
-                                                            <ul className="list-disc pl-4 space-y-1 text-gray-600 text-xs mb-3">
-                                                                {enq.plannerData.selectedModules?.map((m: any, i: number) => (
-                                                                    <li key={i}>{m.title} <span className="text-gray-400">({m.duration})</span></li>
-                                                                ))}
-                                                            </ul>
-                                                            {enq.plannerData.customInstructions && (
-                                                                <div className="text-xs italic text-gray-500 bg-white p-2 rounded border border-gray-100">
-                                                                    "{enq.plannerData.customInstructions}"
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    ) : (
-                                                        <div className="text-gray-600 text-sm leading-relaxed max-w-sm">
-                                                            "{enq.message}"
-                                                        </div>
-                                                    )}
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={() => setSelectedEnquiry(enq)}
+                                                            className="p-2 text-gray-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
+                                                            title="View Details"
+                                                        >
+                                                            <Eye size={18} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => deleteEnquiry(enq._id)}
+                                                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                            title="Delete"
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
@@ -307,6 +340,108 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                 </div>
             </main>
+
+            {/* View Details Modal */}
+            {selectedEnquiry && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-800">Enquiry Details</h3>
+                                <p className="text-sm text-gray-500">ID: {selectedEnquiry._id}</p>
+                            </div>
+                            <button onClick={() => setSelectedEnquiry(null)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                                <X size={24} className="text-gray-500" />
+                            </button>
+                        </div>
+                        <div className="p-8 overflow-y-auto">
+                            <div className="grid grid-cols-2 gap-6 mb-8">
+                                <div>
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Client Name</label>
+                                    <p className="text-gray-900 font-medium text-lg">{selectedEnquiry.name}</p>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Company</label>
+                                    <p className="text-gray-900 font-medium text-lg">{selectedEnquiry.company || '-'}</p>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email</label>
+                                    <p className="text-gray-600">{selectedEnquiry.email}</p>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Phone</label>
+                                    <p className="text-gray-600">{selectedEnquiry.phone || '-'}</p>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Status</label>
+                                    <div className="mt-1">
+                                        <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium border ${selectedEnquiry.status === 'new' ? 'bg-green-100 text-green-700 border-green-200' :
+                                                selectedEnquiry.status === 'contacted' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                                                    'bg-gray-100 text-gray-700 border-gray-200'
+                                            }`}>
+                                            {selectedEnquiry.status.charAt(0).toUpperCase() + selectedEnquiry.status.slice(1)}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Date</label>
+                                    <p className="text-gray-600">{new Date(selectedEnquiry.createdAt).toLocaleString()}</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-3">
+                                    {selectedEnquiry.type === 'planner' ? 'Smart Plan Details' : 'Message'}
+                                </label>
+
+                                {selectedEnquiry.type === 'planner' && selectedEnquiry.plannerData ? (
+                                    <div className="space-y-4">
+                                        <div>
+                                            <h5 className="font-semibold text-purple-700 mb-2 flex items-center gap-2">
+                                                <Briefcase size={16} /> Selected Modules
+                                            </h5>
+                                            <ul className="space-y-2">
+                                                {selectedEnquiry.plannerData.selectedModules?.map((m: any, i: number) => (
+                                                    <li key={i} className="flex justify-between items-center bg-white p-3 rounded border border-gray-200 shadow-sm text-sm">
+                                                        <span className="font-medium text-gray-800">{m.title}</span>
+                                                        <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-500">{m.duration}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                        {selectedEnquiry.plannerData.customInstructions && (
+                                            <div>
+                                                <h5 className="font-semibold text-gray-700 mb-2">Custom Requirements</h5>
+                                                <div className="bg-white p-4 rounded border border-gray-200 text-gray-600 italic text-sm">
+                                                    "{selectedEnquiry.plannerData.customInstructions}"
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                        {selectedEnquiry.message}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="p-6 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3">
+                            <button
+                                onClick={() => setSelectedEnquiry(null)}
+                                className="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-colors"
+                            >
+                                Close
+                            </button>
+                            <a
+                                href={`mailto:${selectedEnquiry.email}`}
+                                className="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-lg shadow-lg shadow-brand-500/20 transition-all flex items-center gap-2"
+                            >
+                                <Mail size={18} /> Reply via Email
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
