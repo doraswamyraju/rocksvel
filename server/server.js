@@ -38,21 +38,35 @@ app.post('/api/enquiries', async (req, res) => {
         const savedEnquiry = await newEnquiry.save();
 
         // 1. Send Email to Admin
-        const adminMailOptions = {
-            from: process.env.EMAIL_USER,
-            to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER, // Send to self if not specified
-            subject: `New Enquiry from ${req.body.name}`,
-            text: `
+        let adminText = `
 New Enquiry Received:
 
 Name: ${req.body.name}
 Email: ${req.body.email}
 Phone: ${req.body.phone}
 Type: ${req.body.type}
+`;
+
+        if (req.body.courseData) {
+            adminText += `
+Course Only Details:
+Course: ${req.body.courseData.courseTitle}
+Next Batch: ${req.body.courseData.nextBatch}
+Price: ${req.body.courseData.price}
+`;
+        }
+
+        adminText += `
 Message/Details: ${req.body.message || 'Check Dashboard for details'}
 
 View Dashboard: https://rocksvel.com/admin
-            `
+`;
+
+        const adminMailOptions = {
+            from: process.env.EMAIL_USER,
+            to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+            subject: `New Enquiry from ${req.body.name} - ${req.body.courseData?.courseTitle || req.body.type}`,
+            text: adminText
         };
 
         // 2. Send Confirmation to User

@@ -1,7 +1,7 @@
 
 
 import React, { useEffect, useState } from 'react';
-import { Mail, Phone, Briefcase, Search, LayoutDashboard, LogOut, CheckCircle2, CircleDashed, XCircle, ArrowUpRight, Filter, ChevronDown, Bell, Menu, X, Trash2, Eye } from 'lucide-react';
+import { Mail, Phone, Briefcase, Search, LayoutDashboard, LogOut, CheckCircle2, CircleDashed, XCircle, ArrowUpRight, Filter, ChevronDown, Bell, Menu, X, Trash2, Eye, GraduationCap, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Enquiry {
@@ -11,8 +11,13 @@ interface Enquiry {
     phone: string;
     company: string;
     message: string;
-    type: 'general' | 'planner';
+    type: 'general' | 'planner' | 'institute' | 'crash-course';
     plannerData?: any;
+    courseData?: {
+        courseTitle: string;
+        price: string;
+        nextBatch: string;
+    };
     createdAt: string;
     status: string;
 }
@@ -23,6 +28,7 @@ export const AdminDashboard: React.FC = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+    const [filterType, setFilterType] = useState<string>('all');
     const navigate = useNavigate();
 
     // Load auth state from session storage for persistence on refresh
@@ -94,15 +100,21 @@ export const AdminDashboard: React.FC = () => {
 
     const [selectedEnquiry, setSelectedEnquiry] = useState<Enquiry | null>(null);
 
-    const filteredEnquiries = enquiries.filter(enq =>
-        enq.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        enq.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (enq.company && enq.company.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    const filteredEnquiries = enquiries.filter(enq => {
+        const matchesSearch = enq.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            enq.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (enq.company && enq.company.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        const matchesFilter = filterType === 'all' || enq.type === filterType;
+
+        return matchesSearch && matchesFilter;
+    });
 
     const stats = {
         total: enquiries.length,
         smartPlans: enquiries.filter(e => e.type === 'planner').length,
+        crashCourses: enquiries.filter(e => e.type === 'crash-course').length,
+        institute: enquiries.filter(e => e.type === 'institute').length,
         newToday: enquiries.filter(e => {
             const date = new Date(e.createdAt);
             const today = new Date();
@@ -152,10 +164,19 @@ export const AdminDashboard: React.FC = () => {
                     <p className="text-xs text-brand-300 uppercase tracking-widest mt-1">Admin Console</p>
                 </div>
                 <nav className="flex-1 px-4 py-6 space-y-2">
-                    <a href="#" className="flex items-center gap-3 px-4 py-3 bg-brand-800 rounded-lg text-white font-medium shadow-sm transition-all border border-brand-700">
-                        <LayoutDashboard size={20} /> Dashboard
-                    </a>
-                    <a href="/" target="_blank" className="flex items-center gap-3 px-4 py-3 text-brand-200 hover:bg-brand-800 hover:text-white rounded-lg transition-colors">
+                    <button onClick={() => setFilterType('all')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${filterType === 'all' ? 'bg-brand-800 text-white border border-brand-700' : 'text-brand-200 hover:bg-brand-800'}`}>
+                        <LayoutDashboard size={20} /> All Enquiries
+                    </button>
+                    <button onClick={() => setFilterType('planner')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${filterType === 'planner' ? 'bg-brand-800 text-white border border-brand-700' : 'text-brand-200 hover:bg-brand-800'}`}>
+                        <Briefcase size={20} /> Smart Plans
+                    </button>
+                    <button onClick={() => setFilterType('crash-course')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${filterType === 'crash-course' ? 'bg-brand-800 text-white border border-brand-700' : 'text-brand-200 hover:bg-brand-800'}`}>
+                        <Zap size={20} /> Crash Courses
+                    </button>
+                    <button onClick={() => setFilterType('institute')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${filterType === 'institute' ? 'bg-brand-800 text-white border border-brand-700' : 'text-brand-200 hover:bg-brand-800'}`}>
+                        <GraduationCap size={20} /> Institute
+                    </button>
+                    <a href="/" target="_blank" className="flex items-center gap-3 px-4 py-3 text-brand-200 hover:bg-brand-800 hover:text-white rounded-lg transition-colors mt-8">
                         <ArrowUpRight size={20} /> View Website
                     </a>
                 </nav>
@@ -193,7 +214,7 @@ export const AdminDashboard: React.FC = () => {
 
                 <div className="p-8">
                     {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                             <div className="flex justify-between items-start mb-4">
                                 <div>
@@ -217,7 +238,18 @@ export const AdminDashboard: React.FC = () => {
                                     <Briefcase size={20} />
                                 </div>
                             </div>
-                            <div className="text-xs text-gray-400">Generated via Smart Planner</div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                            <div className="flex justify-between items-start mb-4">
+                                <div>
+                                    <p className="text-gray-500 text-sm font-medium">Crash Courses</p>
+                                    <h3 className="text-3xl font-bold text-gray-900 mt-1">{stats.crashCourses}</h3>
+                                </div>
+                                <div className="p-2 bg-yellow-50 text-yellow-600 rounded-lg">
+                                    <Zap size={20} />
+                                </div>
+                            </div>
                         </div>
 
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
@@ -230,19 +262,13 @@ export const AdminDashboard: React.FC = () => {
                                     <Bell size={20} />
                                 </div>
                             </div>
-                            <div className="text-xs text-gray-400">Received in last 24h</div>
                         </div>
                     </div>
 
                     {/* Table Section */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
-                            <h3 className="font-bold text-gray-800">Recent Enquiries</h3>
-                            <div className="flex gap-2">
-                                <button className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors">
-                                    <Filter size={14} /> Filter
-                                </button>
-                            </div>
+                            <h3 className="font-bold text-gray-800">Filtered Enquiries: {filterType === 'all' ? 'All' : filterType.toUpperCase()}</h3>
                         </div>
 
                         <div className="overflow-x-auto">
@@ -265,8 +291,8 @@ export const AdminDashboard: React.FC = () => {
                                                         value={enq.status}
                                                         onChange={(e) => updateStatus(enq._id, e.target.value)}
                                                         className={`block w-full rounded-md border-0 py-1.5 pl-2 pr-6 text-xs font-medium ring-1 ring-inset focus:ring-2 focus:ring-brand-600 sm:leading-6 ${enq.status === 'new' ? 'bg-green-50 text-green-700 ring-green-600/20' :
-                                                                enq.status === 'contacted' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' :
-                                                                    'bg-gray-50 text-gray-600 ring-gray-500/10'
+                                                            enq.status === 'contacted' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' :
+                                                                'bg-gray-50 text-gray-600 ring-gray-500/10'
                                                             }`}
                                                     >
                                                         <option value="new">New</option>
@@ -299,9 +325,11 @@ export const AdminDashboard: React.FC = () => {
                                                 <td className="px-6 py-4 align-top w-32">
                                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${enq.type === 'planner'
                                                         ? 'bg-purple-50 text-purple-700 border-purple-100'
-                                                        : 'bg-gray-100 text-gray-700 border-gray-200'
+                                                        : enq.type === 'crash-course' ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                                                            : enq.type === 'institute' ? 'bg-orange-50 text-orange-700 border-orange-200'
+                                                                : 'bg-gray-100 text-gray-700 border-gray-200'
                                                         }`}>
-                                                        {enq.type === 'planner' ? 'Smart Plan' : 'General'}
+                                                        {enq.type}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 align-top">
@@ -376,8 +404,8 @@ export const AdminDashboard: React.FC = () => {
                                     <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Status</label>
                                     <div className="mt-1">
                                         <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium border ${selectedEnquiry.status === 'new' ? 'bg-green-100 text-green-700 border-green-200' :
-                                                selectedEnquiry.status === 'contacted' ? 'bg-blue-100 text-blue-700 border-blue-200' :
-                                                    'bg-gray-100 text-gray-700 border-gray-200'
+                                            selectedEnquiry.status === 'contacted' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                                                'bg-gray-100 text-gray-700 border-gray-200'
                                             }`}>
                                             {selectedEnquiry.status.charAt(0).toUpperCase() + selectedEnquiry.status.slice(1)}
                                         </span>
@@ -391,7 +419,8 @@ export const AdminDashboard: React.FC = () => {
 
                             <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-3">
-                                    {selectedEnquiry.type === 'planner' ? 'Smart Plan Details' : 'Message'}
+                                    {selectedEnquiry.type === 'planner' ? 'Smart Plan Details' :
+                                        selectedEnquiry.type === 'crash-course' ? 'Crash Course Enrollment' : 'Message'}
                                 </label>
 
                                 {selectedEnquiry.type === 'planner' && selectedEnquiry.plannerData ? (
@@ -417,6 +446,16 @@ export const AdminDashboard: React.FC = () => {
                                                 </div>
                                             </div>
                                         )}
+                                    </div>
+                                ) : selectedEnquiry.type === 'crash-course' && selectedEnquiry.courseData ? (
+                                    <div className="space-y-4">
+                                        <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-100">
+                                            <div className="text-sm font-bold text-gray-900 mb-1">{selectedEnquiry.courseData.courseTitle}</div>
+                                            <div className="text-xs text-gray-500">{selectedEnquiry.courseData.nextBatch} | {selectedEnquiry.courseData.price}</div>
+                                        </div>
+                                        <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">
+                                            Message: {selectedEnquiry.message}
+                                        </p>
                                     </div>
                                 ) : (
                                     <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
