@@ -156,7 +156,7 @@ export const AdminDashboard: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="min-h-screen bg-gray-50">
             {/* Sidebar */}
             <aside className="w-64 bg-brand-900 text-white hidden md:flex flex-col fixed h-full z-20">
                 <div className="p-6">
@@ -188,7 +188,7 @@ export const AdminDashboard: React.FC = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 md:ml-64 min-w-0">
+            <main className="md:ml-64 min-h-screen transition-all duration-300">
                 {/* Header */}
                 <header className="bg-white border-b border-gray-200 sticky top-0 z-10 px-8 py-4 flex items-center justify-between shadow-sm">
                     <div className="flex items-center gap-4">
@@ -286,7 +286,7 @@ export const AdminDashboard: React.FC = () => {
                                     {filteredEnquiries.length > 0 ? (
                                         filteredEnquiries.map((enq) => (
                                             <tr key={enq._id} className="hover:bg-blue-50/30 transition-colors group">
-                                                <td className="px-6 py-4 align-top w-24">
+                                                <td className="px-6 py-4 align-top">
                                                     <select
                                                         value={enq.status}
                                                         onChange={(e) => updateStatus(enq._id, e.target.value)}
@@ -303,17 +303,17 @@ export const AdminDashboard: React.FC = () => {
                                                         {new Date(enq.createdAt).toLocaleDateString()}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 align-top w-48">
-                                                    <div className="font-bold text-gray-900 text-sm">{enq.name}</div>
+                                                <td className="px-6 py-4 align-top">
+                                                    <div className="font-bold text-gray-900 text-sm whitespace-nowrap">{enq.name}</div>
                                                     <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
                                                         <Briefcase size={12} className="shrink-0" /> {enq.company || 'N/A'}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 align-top w-48">
+                                                <td className="px-6 py-4 align-top">
                                                     <div className="space-y-1.5">
                                                         <div className="flex items-center gap-2 text-sm text-gray-600 group-hover:text-blue-600 transition-colors">
                                                             <Mail size={14} className="opacity-60" />
-                                                            <span className="truncate max-w-[140px]" title={enq.email}>{enq.email}</span>
+                                                            <span className="truncate max-w-[200px]" title={enq.email}>{enq.email}</span>
                                                         </div>
                                                         {enq.phone && (
                                                             <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -322,7 +322,7 @@ export const AdminDashboard: React.FC = () => {
                                                         )}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 align-top w-32">
+                                                <td className="px-6 py-4 align-top">
                                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${enq.type === 'planner'
                                                         ? 'bg-purple-50 text-purple-700 border-purple-100'
                                                         : enq.type === 'crash-course' ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
