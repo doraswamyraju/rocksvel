@@ -8,7 +8,20 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({
+    verify: (req, res, buf) => {
+        req.rawBody = buf.toString();
+    }
+}));
+
+// JSON Syntax Error Handler
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        console.error('Bad JSON received:', req.rawBody);
+        return res.status(400).send({ message: 'Invalid JSON format', error: err.message });
+    }
+    next();
+});
 
 // Database Connection
 // Database Connection
