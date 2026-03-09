@@ -70,17 +70,29 @@ export const Contact: React.FC<ContactProps> = ({ initialMessage = '', type = 'g
             </p>
 
             <div className="space-y-8">
-              <div className="flex items-start gap-5 group">
+              <div className="flex items-start gap-5 group w-full">
                 <div className="bg-brand-800 p-4 rounded-2xl shrink-0 group-hover:bg-brand-600 transition-all shadow-lg">
                   <MapPin className="text-cyan-400 group-hover:scale-110 transition-transform" />
                 </div>
-                <div>
+                <div className="w-full">
                   <h4 className="font-bold text-xl mb-1">Visit Our Center</h4>
-                  <p className="text-brand-200 text-sm leading-relaxed group-hover:text-white transition-colors">
+                  <p className="text-brand-200 text-sm leading-relaxed group-hover:text-white transition-colors mb-4">
                     3rd Floor, Dwarawati31 Pipeline,<br />
                     Subhodaya Colony, Kukatpally,<br />
                     Hyderabad 500072
                   </p>
+                  <div className="w-full h-48 rounded-xl overflow-hidden shadow-lg border-2 border-brand-800/50 group-hover:border-brand-600 transition-colors">
+                    <iframe
+                      src="https://maps.google.com/maps?q=3rd%20Floor,%20Dwarawati31%20Pipeline,%20Subhodaya%20Colony,%20Kukatpally,%20Hyderabad%20500072&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="RocksVel Office Location"
+                    ></iframe>
+                  </div>
                 </div>
               </div>
 

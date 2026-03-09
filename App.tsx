@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { AdminDashboard } from './components/AdminDashboard';
 import { Hero } from './components/Hero';
@@ -21,6 +21,12 @@ import { FloatingActions } from './components/FloatingActions';
 import { RocksvelInstitute } from './components/RocksvelInstitute';
 import { CorporateCrashCourses } from './components/CorporateCrashCourses';
 import { CourseType } from './components/CrashCourseLanding';
+import { ContactPage } from './components/ContactPage';
+
+// Legal Pages
+import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { TermsOfService } from './components/TermsOfService';
+import { RefundPolicy } from './components/RefundPolicy';
 
 // Course Pages
 import { PythonDSAPage } from './components/courses/PythonDSAPage';
@@ -105,6 +111,10 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/" element={<PublicLayout><CorporateView /></PublicLayout>} />
         <Route path="/institute" element={<PublicLayout><InstituteView /></PublicLayout>} />
+        <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
+        <Route path="/privacy-policy" element={<PublicLayout><PrivacyPolicy /></PublicLayout>} />
+        <Route path="/terms-of-service" element={<PublicLayout><TermsOfService /></PublicLayout>} />
+        <Route path="/refund-policy" element={<PublicLayout><RefundPolicy /></PublicLayout>} />
         <Route path="/course/:courseId" element={<PublicLayout><CoursePageWrapper /></PublicLayout>} />
       </Routes>
     </Router>
