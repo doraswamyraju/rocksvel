@@ -109,6 +109,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/login" element={<AdminDashboard />} />
+        <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="/" element={<PublicLayout><CorporateView /></PublicLayout>} />
         <Route path="/institute" element={<PublicLayout><InstituteView /></PublicLayout>} />
         <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
